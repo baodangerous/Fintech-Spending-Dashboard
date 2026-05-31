@@ -13,7 +13,7 @@ st.markdown("<p style='text-align: center; color: gray; margin-top: 0;'>Phân t�
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data/PS_20174392719_1491204439457_log.csv", nrows=50000)
+    df = pd.read_csv("data/sample.csv")
     return df
 
 with st.spinner("Đang tải dữ liệu..."):
