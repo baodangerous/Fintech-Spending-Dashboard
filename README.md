@@ -1,10 +1,10 @@
-# FINTECH SPENDING DASHBOARD
+# Fintech Spending Dashboard
 
 Phân tích hành vi chi tiêu và phát hiện giao dịch bất thường trong hệ thống ví điện tử.
 
 ## Bài toán
-Fraud detection là một trong những thách thức lớn nhất của Fintech. 
-Project này phân tích 50,000 giao dịch từ dataset PaySim để:
+Fraud detection là một trong những thách thức lớn nhất của Fintech.
+Project này phân tích giao dịch từ dataset PaySim để:
 - Hiểu pattern chi tiêu theo loại giao dịch
 - Phát hiện giao dịch bất thường
 - Trực quan hoá dữ liệu qua dashboard tương tác
@@ -15,14 +15,17 @@ Project này phân tích 50,000 giao dịch từ dataset PaySim để:
 - Streamlit
 
 ## Dataset
-Download từ Kaggle: https://www.kaggle.com/datasets/ealaxi/paysim1  
-Sau khi tải, đặt file CSV vào thư mục `data/`
+Download từ Kaggle: https://www.kaggle.com/datasets/ealaxi/paysim1
+Sau khi tải, đặt file CSV vào thư mục `data/` và đổi tên thành `sample.csv`
 
-## Chạy app
+## Chạy app local
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
+
+## Live Demo
+https://baodangerous-fintech-spending-dashboard-app.streamlit.app
 
 ## Key Insights
 - TRANSFER và CASH_OUT chiếm tỷ lệ tiền lớn nhất
