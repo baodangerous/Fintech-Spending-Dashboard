@@ -19,6 +19,31 @@ def load_data():
 with st.spinner("Đang tải dữ liệu..."):
     df = load_data()
 
+# Sidebar filter
+st.sidebar.header("Bộ lọc")
+
+# Filter theo loại giao dịch
+all_types = df["type"].unique().tolist()
+selected_types = st.sidebar.multiselect(
+    "Loại giao dịch",
+    options=all_types,
+    default=all_types
+)
+
+# Filter theo fraud
+fraud_filter = st.sidebar.radio(
+    "Trạng thái giao dịch",
+    options=["Tất cả", "Bình thường", "Fraud"]
+)
+
+# Áp dụng filter
+df = df[df["type"].isin(selected_types)]
+
+if fraud_filter == "Fraud":
+    df = df[df["isFraud"] == 1]
+elif fraud_filter == "Bình thường":
+    df = df[df["isFraud"] == 0]
+
 st.success(f"Đã tải {len(df):,} giao dịch")
 st.dataframe(df.head(10))
 
@@ -61,3 +86,37 @@ fig3 = px.pie(fraud_count, names="label", values="count",
               title="Tỷ lệ giao dịch Fraud vs Bình thường",
               color_discrete_map={"Fraud": "red", "Bình thường": "green"})
 st.plotly_chart(fig3, use_container_width=True)
+
+st.markdown("---")
+st.subheader("Phát hiện giao dịch bất thường")
+
+# Rule-based anomaly detection
+def detect_anomaly(row):
+    reasons = []
+    
+    # Rule 1: Số dư về 0 sau giao dịch
+    if row["newbalanceOrig"] == 0 and row["oldbalanceOrg"] > 0:
+        reasons.append("Số dư về 0")
+    
+    # Rule 2: Số tiền lớn bất thường (top 1%)
+    if row["amount"] > df["amount"].quantile(0.99):
+        reasons.append("Số tiền bất thường lớn")
+    
+    # Rule 3: TRANSFER hoặc CASH_OUT số tiền lớn
+    if row["type"] in ["TRANSFER", "CASH_OUT"] and row["amount"] > 200000:
+        reasons.append("Chuyển/rút tiền lớn")
+    
+    return ", ".join(reasons) if reasons else "Bình thường"
+
+df["anomaly_reason"] = df.apply(detect_anomaly, axis=1)
+anomaly_df = df[df["anomaly_reason"] != "Bình thường"]
+
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("Giao dịch bất thường phát hiện", f"{len(anomaly_df):,}")
+with col2:
+    st.metric("Tỷ lệ bất thường", f"{len(anomaly_df)/len(df)*100:.1f}%")
+
+st.dataframe(anomaly_df[["type", "amount", "oldbalanceOrg", 
+                           "newbalanceOrig", "isFraud", 
+                           "anomaly_reason"]].head(20))
